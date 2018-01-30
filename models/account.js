@@ -13,7 +13,7 @@ const Account = sequelize.define(
       allowNull: false
     },
     keystore: {
-      type: Sequelize.STRING
+      type: Sequelize.JSON
     },
     userID: {
       type: Sequelize.STRING,
