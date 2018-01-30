@@ -51,7 +51,7 @@ const User = sequelize.define(
 );
 
 sequelize
-  .sync()
+  .sync({ force: process.env.NODE_ENV === 'development' })
   .then(() =>
     console.log(`SEQUELIZE ==> users table has been successfully created, if one doesn't exist`)
   )
