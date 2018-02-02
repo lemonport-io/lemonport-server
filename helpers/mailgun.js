@@ -38,7 +38,7 @@ const sendVerifyEmail = email => {
     </html>
   `;
   const config = {
-    from: 'Lemonport <noreply@lemonport.io>',
+    from: 'Lemonport <contactlemonport@gmail.com>',
     to: email,
     subject: 'Verify your email address',
     html: template

@@ -51,7 +51,7 @@ const signToken = user => {
 
 module.exports = {
   signUp: async (req, res, next) => {
-    const { email, password } = req.value.body;
+    const { email, firstName, lastName, password, facebookID } = req.value.body;
     const foundUser = await User.findOne({ where: { email } });
     if (foundUser) {
       return res.status(403).json({ error: true, message: 'EMAIL_ALREADY_EXISTS' });
@@ -62,6 +62,9 @@ module.exports = {
     const newUser = await User.create({
       uuid,
       email,
+      firstName,
+      lastName,
+      facebookID,
       password,
       walletCount: 1,
       verified,
@@ -122,6 +125,16 @@ module.exports = {
     const { verified, twoFactor } = user;
     const accounts = await getAllAccounts(user.uuid);
     res.status(200).json({ token, email, verified, twoFactor, accounts });
+  },
+  checkUser: async (req, res, next) => {
+    const { email } = req.value.body;
+    const user = await User.findOne({
+      where: { email }
+    });
+    if (!user) {
+      return res.status(200).json({ error: false, message: 'USER_NOT_FOUND' });
+    }
+    res.status(200).json({ error: false, message: 'USER_FOUND' });
   },
   resendVerifyEmail: async (req, res, next) => {
     const { email } = req.foundUser;

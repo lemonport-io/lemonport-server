@@ -18,6 +18,15 @@ const User = sequelize.define(
       unique: true,
       allowNull: false
     },
+    facebookID: {
+      type: Sequelize.STRING
+    },
+    firstName: {
+      type: Sequelize.STRING
+    },
+    lastName: {
+      type: Sequelize.STRING
+    },
     password: {
       type: Sequelize.STRING,
       allowNull: false

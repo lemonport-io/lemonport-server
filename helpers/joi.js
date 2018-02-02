@@ -52,13 +52,28 @@ module.exports = {
       gasPrice: Joi.string().allow(''),
       code: Joi.string().allow('')
     }),
-    authUserSchema: Joi.object().keys({
+    checkUserSchema: Joi.object().keys({
+      email: Joi.string()
+        .email()
+        .required()
+    }),
+    userSignupSchema: Joi.object().keys({
       email: Joi.string()
         .email()
         .required(),
-      password: Joi.string().required()
+      firstName: Joi.string().required(),
+      lastName: Joi.string().required(),
+      password: Joi.string().required(),
+      facebookID: Joi.string().allow('')
     }),
-    authTwoFactorUserSchema: Joi.object().keys({
+    userSigninSchema: Joi.object().keys({
+      email: Joi.string()
+        .email()
+        .required(),
+      password: Joi.string().required(),
+      facebookID: Joi.string().allow('')
+    }),
+    userTwoFactorSchema: Joi.object().keys({
       email: Joi.string()
         .email()
         .required(),

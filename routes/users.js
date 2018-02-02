@@ -6,12 +6,12 @@ const { validateBody, schemas } = require('../helpers/joi');
 const { verifyUserMiddleware } = require('../helpers/jwt');
 const UsersController = require('../controllers/users');
 
-router.route('/signup').post(validateBody(schemas.authUserSchema), UsersController.signUp);
+router.route('/signup').post(validateBody(schemas.userSignupSchema), UsersController.signUp);
 
 router
   .route('/signin')
   .post(
-    validateBody(schemas.authUserSchema),
+    validateBody(schemas.userSigninSchema),
     passport.authenticate('local', { session: false }),
     UsersController.signIn
   );
@@ -19,19 +19,21 @@ router
 router
   .route('/signin-two-factor')
   .post(
-    validateBody(schemas.authTwoFactorUserSchema),
+    validateBody(schemas.userTwoFactorSchema),
     passport.authenticate('local', { session: false }),
     UsersController.signInTwoFactor
   );
 
+router.route('/check-user').post(validateBody(schemas.checkUserSchema), UsersController.checkUser);
+
 router.route('/verify/:hash').get(UsersController.verify);
 
 router
-  .route('/resend-verify-email')
+  .route('/email-verified')
   .get(
     passport.authenticate('jwt', { session: false }),
     verifyUserMiddleware,
-    UsersController.resendVerifyEmail
+    UsersController.emailVerified
   );
 
 router
