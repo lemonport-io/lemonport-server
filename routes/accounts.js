@@ -2,7 +2,6 @@ const express = require('express'); //eslint-disable-line
 const router = require('express-promise-router')();
 const passport = require('passport');
 const passportConfig = require('../passport'); //eslint-disable-line
-const { validateBody, schemas } = require('../helpers/joi');
 const AccountsController = require('../controllers/accounts');
 const { verifyUserMiddleware } = require('../helpers/jwt');
 

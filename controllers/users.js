@@ -65,9 +65,7 @@ module.exports = {
     sendVerifyEmail(email);
     const account = {
       address: newAccount.address,
-      name: newAccount.name,
-      type: newAccount.type,
-      tokens: newAccount.tokens,
+      currency: newAccount.currency,
       balance: newAccount.balance
     };
     res.status(200).json({ token, email, verified, twoFactor, accounts: [account] });
