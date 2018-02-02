@@ -59,8 +59,7 @@ module.exports = {
       keystore,
       userID: uuid,
       userWallet: 1,
-      currency: 'Ethereum',
-      balance: '0.00000000'
+      currency: 'Ethereum'
     });
     const token = signToken(newUser);
     sendVerifyEmail(email);

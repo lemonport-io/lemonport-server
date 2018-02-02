@@ -14,11 +14,8 @@ module.exports = {
     const accounts = await Promise.all(
       accountsRaw.map(async account => {
         if (account.address) {
-          console.log('address        ====>   ', account.address);
           const wei = await web3.eth.getBalance(account.address);
-          console.log('wei            ====>   ', wei);
           const ether = fromWei(wei);
-          console.log('ether          ====>   ', ether);
           const balance = BigNumber(ether).toFormat(8);
           await account.update({ balance }, { where: { address: account.address } });
         }
