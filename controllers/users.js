@@ -1,20 +1,18 @@
-const JWT = require('jsonwebtoken');
 const BigNumber = require('bignumber.js');
 const uuidv4 = require('uuid/v4');
 const { web3 } = require('../web3');
 const User = require('../models/user');
 const Account = require('../models/account');
-const { JWT_SECRET } = require('../config/index');
+const { signToken } = require('../helpers/jwt');
 const { sendVerifyEmail } = require('../helpers/mailgun');
 const { decrypt } = require('../helpers/cipher');
-const { getAccountTokens } = require('../web3/methods');
 const { fromWei } = require('../web3/helpers');
 const { encryptAccount } = require('../web3/keystore');
 const { generateSecret, verifyTwoFactor } = require('../helpers/twoFactor');
 
 const getAllAccounts = async userID => {
   const accountsRaw = await Account.findAll({
-    attributes: ['address', 'name', 'type', 'tokens', 'balance'],
+    attributes: ['address', 'currency', 'balance'],
     where: { userID },
     order: [['createdAt', 'ASC']]
   });
@@ -23,30 +21,14 @@ const getAllAccounts = async userID => {
       if (account.address) {
         const wei = await web3.eth.getBalance(account.address);
         const ether = fromWei(wei);
+        console.log(ether);
         const balance = BigNumber(ether).toFormat(8);
-        let tokens = null;
-        if (account.tokens) {
-          const tokenList = account.tokens.map(token => token.symbol);
-          tokens = await getAccountTokens(account.address, tokenList);
-        }
-        await account.update({ balance, tokens }, { where: { address: account.address } });
+        await account.update({ balance }, { where: { address: account.address } });
       }
       return account;
     })
   );
   return accounts;
-};
-
-const signToken = user => {
-  return JWT.sign(
-    {
-      iss: 'lemonport.io',
-      sub: user.uuid,
-      iat: Date.now(),
-      exp: Date.now() + 1800000 // 30 mins
-    },
-    JWT_SECRET
-  );
 };
 
 module.exports = {
@@ -76,7 +58,9 @@ module.exports = {
       address: generatedWallet.address,
       keystore,
       userID: uuid,
-      userWallet: 1
+      userWallet: 1,
+      currency: 'Ethereum',
+      balance: '0.00000000'
     });
     const token = signToken(newUser);
     sendVerifyEmail(email);

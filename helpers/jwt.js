@@ -3,6 +3,22 @@ const User = require('../models/user');
 const { JWT_SECRET } = require('../config/index');
 
 /**
+ * sign user jsonwebtoken
+ * @type {Object}
+ */
+const signToken = user => {
+  return JWT.sign(
+    {
+      iss: 'lemonport.io',
+      sub: user.uuid,
+      iat: Date.now(),
+      exp: Date.now() + 1800000 // 30 mins
+    },
+    JWT_SECRET
+  );
+};
+
+/**
  * @desc verify and find user middleware
  */
 const verifyUserMiddleware = async (req, res, next) => {
@@ -28,5 +44,6 @@ const verifyUserMiddleware = async (req, res, next) => {
 };
 
 module.exports = {
-  verifyUserMiddleware
+  verifyUserMiddleware,
+  signToken
 };

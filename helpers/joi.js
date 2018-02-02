@@ -17,26 +17,6 @@ module.exports = {
   },
 
   schemas: {
-    generateAccountSchema: Joi.object().keys({
-      name: Joi.string().allow('')
-    }),
-    importAccountSchema: Joi.object().keys({
-      name: Joi.string().allow(''),
-      address: Joi.string().required(),
-      privateKey: Joi.string().required()
-    }),
-    addAddressSchema: Joi.object().keys({
-      name: Joi.string().allow(''),
-      address: Joi.string().required()
-    }),
-    renameAccountSchema: Joi.object().keys({
-      name: Joi.string().required(),
-      address: Joi.string().required()
-    }),
-    deleteAccountSchema: Joi.object().keys({
-      address: Joi.string().required(),
-      code: Joi.string().allow('')
-    }),
     sendEtherSchema: Joi.object().keys({
       from: Joi.string().required(),
       to: Joi.string().required(),

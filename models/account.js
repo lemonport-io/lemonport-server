@@ -3,57 +3,36 @@ const { DATABASE } = require('../config/index');
 
 const sequelize = new Sequelize(DATABASE);
 
-const Account = sequelize.define(
-  'accounts',
-  {
-    address: {
-      type: Sequelize.STRING,
-      unique: true,
-      primaryKey: true,
-      allowNull: false
-    },
-    keystore: {
-      type: Sequelize.JSON
-    },
-    userID: {
-      type: Sequelize.STRING,
-      allowNull: false
-    },
-    userWallet: {
-      type: Sequelize.INTEGER,
-      allowNull: false
-    },
-    name: {
-      type: Sequelize.STRING
-    },
-    type: {
-      type: Sequelize.STRING
-    },
-    tokens: {
-      type: Sequelize.ARRAY(Sequelize.JSON)
-    },
-    balance: {
-      type: Sequelize.STRING
-    }
+const Account = sequelize.define('accounts', {
+  address: {
+    type: Sequelize.STRING,
+    unique: true,
+    primaryKey: true,
+    allowNull: false
   },
-  {
-    hooks: {
-      beforeCreate: async user => {
-        if (user.keystore) {
-          user.type = 'HOT';
-        } else {
-          user.type = 'COLD';
-        }
-        if (!user.balance) {
-          user.balance = '0.00000000';
-        }
-        if (!user.name) {
-          user.name = `Wallet ${user.userWallet}`;
-        }
-      }
-    }
+  keystore: {
+    type: Sequelize.JSON
+  },
+  userID: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  userWallet: {
+    type: Sequelize.INTEGER,
+    allowNull: false
+  },
+  currency: {
+    type: Sequelize.STRING
+  },
+  balance: {
+    type: Sequelize.STRING,
+    defaultValue: '0.00000000'
+  },
+  token: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false
   }
-);
+});
 
 sequelize
   .sync({ force: process.env.NODE_ENV === 'development' })
