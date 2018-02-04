@@ -13,4 +13,12 @@ router
     AccountsController.all
   );
 
+router
+  .route('/:currency')
+  .get(
+    passport.authenticate('jwt', { session: false }),
+    verifyUserMiddleware,
+    AccountsController.currency
+  );
+
 module.exports = router;

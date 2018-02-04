@@ -8,6 +8,7 @@ const { sendVerifyEmail } = require('../helpers/mailgun');
 const { decrypt } = require('../helpers/cipher');
 const { fromWei } = require('../web3/helpers');
 const { encryptAccount } = require('../web3/keystore');
+const { createBitcoinWallet, getBitcoinBalance, fromSatoshi } = require('../blocktrail');
 const { generateSecret, verifyTwoFactor } = require('../helpers/twoFactor');
 
 const getAllAccounts = async userID => {
@@ -18,11 +19,15 @@ const getAllAccounts = async userID => {
   });
   const accounts = await Promise.all(
     accountsRaw.map(async account => {
-      if (account.address) {
+      if (account.currency === 'ETH') {
         const wei = await web3.eth.getBalance(account.address);
         const ether = fromWei(wei);
-        console.log(ether);
         const balance = BigNumber(ether).toFormat(8);
+        await account.update({ balance }, { where: { address: account.address } });
+      } else if (account.currency === 'BTC') {
+        const satoshi = await getBitcoinBalance(account.address);
+        const bitcoin = fromSatoshi(satoshi);
+        const balance = BigNumber(bitcoin).toFormat(8);
         await account.update({ balance }, { where: { address: account.address } });
       }
       return account;
@@ -48,27 +53,43 @@ module.exports = {
       lastName,
       facebookID,
       password,
-      walletCount: 1,
+      walletCount: 2,
       verified,
       twoFactor
     });
-    const generatedWallet = web3.eth.accounts.create();
-    const keystore = encryptAccount(generatedWallet.privateKey, password);
-    const newAccount = await Account.create({
-      address: generatedWallet.address,
-      keystore,
+    const ethWallet = web3.eth.accounts.create();
+    const ethKeystore = encryptAccount(ethWallet.privateKey, password);
+    const ethAccount = await Account.create({
+      address: ethWallet.address,
+      keystore: ethKeystore,
       userID: uuid,
       userWallet: 1,
-      currency: 'Ethereum'
+      currency: 'ETH'
+    });
+    const btcWallet = await createBitcoinWallet(password);
+    console.log(btcWallet);
+    const btcAccount = await Account.create({
+      address: btcWallet.checksum,
+      keystore: { type: 'blocktrail', identifier: btcWallet.identifier },
+      userID: uuid,
+      userWallet: 2,
+      currency: 'BTC'
     });
     const token = signToken(newUser);
     sendVerifyEmail(email);
-    const account = {
-      address: newAccount.address,
-      currency: newAccount.currency,
-      balance: newAccount.balance
-    };
-    res.status(200).json({ token, email, verified, twoFactor, accounts: [account] });
+    const accounts = [
+      {
+        address: ethAccount.address,
+        currency: ethAccount.currency,
+        balance: ethAccount.balance
+      },
+      {
+        address: btcAccount.address,
+        currency: btcAccount.currency,
+        balance: btcAccount.balance
+      }
+    ];
+    res.status(200).json({ token, email, verified, twoFactor, accounts });
   },
   signIn: async (req, res, next) => {
     const { email } = req.value.body;

@@ -11,7 +11,9 @@ switch (process.env.NODE_ENV) {
       VERIFY_SECRET: process.env.LEMONPORT_VERIFY_SECRET,
       KEYSTORE_HASH: process.env.LEMONPORT_KEYSTORE_HASH,
       MAILGUN_API_KEY: process.env.LEMONPORT_MAILGUN_API_KEY,
-      MAILGUN_DOMAIN: 'mg.lemonport.io'
+      MAILGUN_API_DOMAIN: process.env.LEMONPORT_MAILGUN_API_DOMAIN,
+      BLOCKTRAIL_API_KEY: process.env.LEMONPORT_BLOCKTRAIL_API_KEY,
+      BLOCKTRAIL_API_SECRET: process.env.LEMONPORT_BLOCKTRAIL_API_SECRET
     };
     break;
   case 'staging':
@@ -24,7 +26,9 @@ switch (process.env.NODE_ENV) {
       VERIFY_SECRET: process.env.LEMONPORT_VERIFY_SECRET,
       KEYSTORE_HASH: process.env.LEMONPORT_KEYSTORE_HASH,
       MAILGUN_API_KEY: process.env.LEMONPORT_MAILGUN_API_KEY,
-      MAILGUN_DOMAIN: 'mg.lemonport.io'
+      MAILGUN_API_DOMAIN: process.env.LEMONPORT_MAILGUN_API_DOMAIN,
+      BLOCKTRAIL_API_KEY: process.env.LEMONPORT_BLOCKTRAIL_API_KEY,
+      BLOCKTRAIL_API_SECRET: process.env.LEMONPORT_BLOCKTRAIL_API_SECRET
     };
     break;
   case 'production':
@@ -37,7 +41,9 @@ switch (process.env.NODE_ENV) {
       VERIFY_SECRET: process.env.LEMONPORT_VERIFY_SECRET,
       KEYSTORE_HASH: process.env.LEMONPORT_KEYSTORE_HASH,
       MAILGUN_API_KEY: process.env.LEMONPORT_MAILGUN_API_KEY,
-      MAILGUN_DOMAIN: 'mg.lemonport.io'
+      MAILGUN_API_DOMAIN: process.env.LEMONPORT_MAILGUN_API_DOMAIN,
+      BLOCKTRAIL_API_KEY: process.env.LEMONPORT_BLOCKTRAIL_API_KEY,
+      BLOCKTRAIL_API_SECRET: process.env.LEMONPORT_BLOCKTRAIL_API_SECRET
     };
     break;
   default:

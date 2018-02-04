@@ -1,8 +1,8 @@
 const Mailgun = require('mailgun-js');
 const { encrypt } = require('../helpers/cipher');
-const { DOMAIN, MAILGUN_API_KEY, MAILGUN_DOMAIN } = require('../config/index');
+const { DOMAIN, MAILGUN_API_KEY, MAILGUN_API_DOMAIN } = require('../config/index');
 
-const mailgun = new Mailgun({ apiKey: MAILGUN_API_KEY, domain: MAILGUN_DOMAIN });
+const mailgun = new Mailgun({ apiKey: MAILGUN_API_KEY, domain: MAILGUN_API_DOMAIN });
 
 const sendEmail = config =>
   new Promise((resolve, reject) => {
