@@ -17,6 +17,12 @@ module.exports = {
   },
 
   schemas: {
+    sendBitcoinSchema: Joi.object().keys({
+      from: Joi.string().required(),
+      to: Joi.string().required(),
+      value: Joi.string().required(),
+      code: Joi.string().allow('')
+    }),
     sendEtherSchema: Joi.object().keys({
       from: Joi.string().required(),
       to: Joi.string().required(),

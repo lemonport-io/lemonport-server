@@ -1,9 +1,8 @@
-const { BlocktrailSDK } = require('blocktrail-sdk');
-const BigNumber = require('bignumber.js');
+const blocktrail = require('blocktrail-sdk');
 const uuid = require('uuid/v4');
 const { KEYSTORE_HASH, BLOCKTRAIL_API_KEY, BLOCKTRAIL_API_SECRET } = require('../config');
 
-const bitcoinClient = BlocktrailSDK({
+const bitcoinClient = blocktrail.BlocktrailSDK({
   apiKey: BLOCKTRAIL_API_KEY,
   apiSecret: BLOCKTRAIL_API_SECRET,
   network: 'BTC',
@@ -62,17 +61,17 @@ const getBitcoinBalance = address =>
 
 /**
  * @desc convert from satoshi to bitcoin
- * @param  {Number} satoshi
- * @return {BigNumber}
+ * @param  {String} satoshi
+ * @return {Number}
  */
-const fromSatoshi = satoshi => BigNumber(String(satoshi)).times('1e-8');
+const fromSatoshi = satoshi => blocktrail.toBTC(Number(satoshi.replace(/[^0-9.]/g, '')));
 
 /**
  * @desc convert from bitcoin to satoshi
- * @param  {Number} bitcoin
- * @return {BigNumber}
+ * @param  {String} bitcoin
+ * @return {Number}
  */
-const toSatoshi = bitcoin => BigNumber(String(bitcoin)).dividedBy('1e-8');
+const toSatoshi = bitcoin => blocktrail.toSatoshi(Number(bitcoin.replace(/[^0-9.]/g, '')));
 
 module.exports = {
   createBitcoinWallet,

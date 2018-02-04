@@ -7,6 +7,7 @@ const { LOGGER } = require('./config/index');
 const UsersRoutes = require('./routes/users');
 const AccountsRoutes = require('./routes/accounts');
 const EthereumRoutes = require('./routes/ethereum');
+const BitcoinRoutes = require('./routes/bitcoin');
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/users', UsersRoutes);
 app.use('/accounts', AccountsRoutes);
 app.use('/ethereum', EthereumRoutes);
+app.use('/bitcoin', BitcoinRoutes);
 
 app.get('/network', (req, res) => {
   const network = web3.currentProvider.host
