@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const helmet = require('helmet');
-const { web3 } = require('./web3');
 const { LOGGER } = require('./config/index');
 const UsersRoutes = require('./routes/users');
 const AccountsRoutes = require('./routes/accounts');
@@ -23,9 +22,7 @@ app.use('/ethereum', EthereumRoutes);
 app.use('/bitcoin', BitcoinRoutes);
 
 app.get('/network', (req, res) => {
-  const network = web3.currentProvider.host
-    .match(/(https?:\/\/)\w+/gi)[0]
-    .replace(/(https?:\/\/)/gi, '');
+  const network = process.env.NODE_ENV !== 'production' ? 'TestNet' : 'MainNet';
   res.status(200).json({ network });
 });
 

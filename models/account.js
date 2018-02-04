@@ -4,10 +4,14 @@ const { DATABASE } = require('../config/index');
 const sequelize = new Sequelize(DATABASE);
 
 const Account = sequelize.define('accounts', {
-  address: {
+  identifier: {
     type: Sequelize.STRING,
     unique: true,
     primaryKey: true,
+    allowNull: false
+  },
+  address: {
+    type: Sequelize.STRING,
     allowNull: false
   },
   keystore: {
@@ -15,10 +19,6 @@ const Account = sequelize.define('accounts', {
   },
   userID: {
     type: Sequelize.STRING,
-    allowNull: false
-  },
-  userWallet: {
-    type: Sequelize.INTEGER,
     allowNull: false
   },
   currency: {
@@ -34,8 +34,9 @@ const Account = sequelize.define('accounts', {
   }
 });
 
+// .sync({ force: process.env.NODE_ENV === 'development' })
 sequelize
-  .sync({ force: process.env.NODE_ENV === 'development' })
+  .sync()
   .then(() =>
     console.log(`SEQUELIZE ==> wallets table has been successfully created, if one doesn't exist`)
   )

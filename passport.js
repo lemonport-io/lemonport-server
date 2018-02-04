@@ -14,7 +14,7 @@ passport.use(
     },
     async (payload, done) => {
       try {
-        const user = User.findOne({ where: { uuid: payload.sub } });
+        const user = User.findOne({ where: { userID: payload.sub } });
 
         if (!user) {
           return done(null, false);

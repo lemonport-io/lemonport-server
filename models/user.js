@@ -7,7 +7,7 @@ const sequelize = new Sequelize(DATABASE);
 const User = sequelize.define(
   'users',
   {
-    uuid: {
+    userID: {
       type: Sequelize.STRING,
       unique: true,
       primaryKey: true,
@@ -29,10 +29,6 @@ const User = sequelize.define(
     },
     password: {
       type: Sequelize.STRING,
-      allowNull: false
-    },
-    walletCount: {
-      type: Sequelize.INTEGER,
       allowNull: false
     },
     verified: {
@@ -59,8 +55,9 @@ const User = sequelize.define(
   }
 );
 
+// .sync({ force: process.env.NODE_ENV === 'development' })
 sequelize
-  .sync({ force: process.env.NODE_ENV === 'development' })
+  .sync()
   .then(() =>
     console.log(`SEQUELIZE ==> users table has been successfully created, if one doesn't exist`)
   )

@@ -1,5 +1,5 @@
 const BigNumber = require('bignumber.js');
-const uuidv4 = require('uuid/v4');
+const uuid = require('uuid/v4');
 const { web3 } = require('../web3');
 const User = require('../models/user');
 const Account = require('../models/account');
@@ -8,12 +8,17 @@ const { sendVerifyEmail } = require('../helpers/mailgun');
 const { decrypt } = require('../helpers/cipher');
 const { fromWei } = require('../web3/helpers');
 const { encryptAccount } = require('../web3/keystore');
-const { createBitcoinWallet, getBitcoinBalance, fromSatoshi } = require('../blocktrail');
+const {
+  createBitcoinWallet,
+  generateBitcoinAddress,
+  getBitcoinBalance,
+  fromSatoshi
+} = require('../blocktrail');
 const { generateSecret, verifyTwoFactor } = require('../helpers/twoFactor');
 
 const getAllAccounts = async userID => {
   const accountsRaw = await Account.findAll({
-    attributes: ['address', 'currency', 'balance'],
+    attributes: ['identifier', 'address', 'currency', 'balance'],
     where: { userID },
     order: [['createdAt', 'ASC']]
   });
@@ -23,12 +28,12 @@ const getAllAccounts = async userID => {
         const wei = await web3.eth.getBalance(account.address);
         const ether = fromWei(wei);
         const balance = BigNumber(ether).toFormat(8);
-        await account.update({ balance }, { where: { address: account.address } });
+        await account.update({ balance }, { where: { identifier: account.identifier } });
       } else if (account.currency === 'BTC') {
         const satoshi = await getBitcoinBalance(account.address);
         const bitcoin = fromSatoshi(satoshi);
         const balance = BigNumber(bitcoin).toFormat(8);
-        await account.update({ balance }, { where: { address: account.address } });
+        await account.update({ balance }, { where: { identifier: account.identifier } });
       }
       return account;
     })
@@ -43,36 +48,36 @@ module.exports = {
     if (foundUser) {
       return res.status(403).json({ error: true, message: 'EMAIL_ALREADY_EXISTS' });
     }
-    const uuid = uuidv4();
+    const userID = uuid();
     const verified = false;
     const twoFactor = false;
     const newUser = await User.create({
-      uuid,
+      userID,
       email,
       firstName,
       lastName,
       facebookID,
       password,
-      walletCount: 2,
       verified,
       twoFactor
     });
+    const ethIdentifier = uuid();
     const ethWallet = web3.eth.accounts.create();
     const ethKeystore = encryptAccount(ethWallet.privateKey, password);
     const ethAccount = await Account.create({
+      identifier: ethIdentifier,
       address: ethWallet.address,
       keystore: ethKeystore,
-      userID: uuid,
-      userWallet: 1,
+      userID,
       currency: 'ETH'
     });
-    const btcWallet = await createBitcoinWallet(password);
-    console.log(btcWallet);
+    const btcIdentifier = uuid();
+    const btcWallet = await createBitcoinWallet(btcIdentifier, password);
+    const address = await generateBitcoinAddress(btcWallet.identifier, password);
     const btcAccount = await Account.create({
-      address: btcWallet.checksum,
-      keystore: { type: 'blocktrail', identifier: btcWallet.identifier },
-      userID: uuid,
-      userWallet: 2,
+      identifier: btcIdentifier,
+      address,
+      userID,
       currency: 'BTC'
     });
     const token = signToken(newUser);
@@ -89,12 +94,21 @@ module.exports = {
         balance: btcAccount.balance
       }
     ];
-    res.status(200).json({ token, email, verified, twoFactor, accounts });
+    res.status(200).json({
+      firstName,
+      lastName,
+      facebookID,
+      token,
+      email,
+      verified,
+      twoFactor,
+      accounts
+    });
   },
   signIn: async (req, res, next) => {
     const { email } = req.value.body;
     const user = await User.findOne({
-      attributes: ['uuid', 'verified', 'twoFactor', 'secret'],
+      attributes: ['firstName', 'lastName', 'userID', 'verified', 'facebookID', 'twoFactor'],
       where: { email }
     });
     if (!user) {
@@ -104,14 +118,31 @@ module.exports = {
       return res.status(200).json({ error: false, message: 'REQUIRE_TWO_FACTOR' });
     }
     const token = signToken(user);
-    const { verified, twoFactor } = user;
-    const accounts = await getAllAccounts(user.uuid);
-    res.status(200).json({ token, email, verified, twoFactor, accounts });
+    const { firstName, lastName, facebookID, verified, twoFactor } = user;
+    const accounts = await getAllAccounts(user.userID);
+    res.status(200).json({
+      firstName,
+      lastName,
+      facebookID,
+      token,
+      email,
+      verified,
+      twoFactor,
+      accounts
+    });
   },
   signInTwoFactor: async (req, res, next) => {
     const { email, code } = req.value.body;
     const user = await User.findOne({
-      attributes: ['uuid', 'verified', 'twoFactor', 'secret'],
+      attributes: [
+        'firstName',
+        'lastName',
+        'userID',
+        'verified',
+        'facebookID',
+        'twoFactor',
+        'secret'
+      ],
       where: { email }
     });
     if (!user) {
@@ -124,9 +155,18 @@ module.exports = {
       }
     }
     const token = signToken(user);
-    const { verified, twoFactor } = user;
-    const accounts = await getAllAccounts(user.uuid);
-    res.status(200).json({ token, email, verified, twoFactor, accounts });
+    const { firstName, lastName, facebookID, verified, twoFactor } = user;
+    const accounts = await getAllAccounts(user.userID);
+    res.status(200).json({
+      firstName,
+      lastName,
+      facebookID,
+      token,
+      email,
+      verified,
+      twoFactor,
+      accounts
+    });
   },
   checkUser: async (req, res, next) => {
     const { email } = req.value.body;

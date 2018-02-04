@@ -10,7 +10,7 @@ const signToken = user => {
   return JWT.sign(
     {
       iss: 'lemonport.io',
-      sub: user.uuid,
+      sub: user.userID,
       iat: Date.now(),
       exp: Date.now() + 1800000 // 30 mins
     },
@@ -23,16 +23,16 @@ const signToken = user => {
  */
 const verifyUserMiddleware = async (req, res, next) => {
   const token = req.headers.authorization;
-  let uuid = null;
+  let userID = null;
   let foundUser = null;
   try {
     const jwt = JWT.verify(token, JWT_SECRET);
-    uuid = jwt.sub;
+    userID = jwt.sub;
   } catch (error) {
     return res.status(500).json({ error: true, message: 'INVALID_JWT' });
   }
-  if (uuid) {
-    foundUser = await User.findOne({ where: { uuid } });
+  if (userID) {
+    foundUser = await User.findOne({ where: { userID } });
   } else {
     return res.status(500).json({ error: true, message: 'MISSING_USER_ID' });
   }

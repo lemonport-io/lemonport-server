@@ -15,7 +15,7 @@ module.exports = {
     }
     let account;
     account = await Account.findOne({
-      where: { userID: user.uuid, address: from }
+      where: { userID: user.userID, address: from }
     });
     const unlockedKeystore = decryptAccount(account.keystore, user.password);
     sendSignedTransaction({
@@ -41,7 +41,7 @@ module.exports = {
     }
     let account;
     account = await Account.findOne({
-      where: { userID: user.uuid, address: from }
+      where: { userID: user.userID, address: from }
     });
     const unlockedKeystore = decryptAccount(account.keystore, user.password);
     transferToken({
